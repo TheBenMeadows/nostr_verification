@@ -1,36 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVG Test</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
 </head>
-<body style="margin:0px;">
-    <embed id="svg-container" type="image/svg+xml" width="100%" height="100%" />
 
-    <script type="module">
-        console.log("Script is starting...");
+<body>
+    <div id="scene"></div>
+    <script src="https://ordinals.com/content/2dbdf9ebbec6be793fd16ae9b797c7cf968ab2427166aaf390b90b71778266abi0"></script> <!-- Include the fflate library -->
+    <script>
+        async function fetchAndDisplaySVGZ() {
+            // Fetch the SVGZ
+            let response = await fetch('https://raw.githubusercontent.com/TheBenMeadows/HostedFiles/master/Mask%20-%20Bulls%20Zip.svgz');
+            let compressedData = await response.arrayBuffer();
 
-        async function displaySvgz(url) {
-            console.log("Attempting to fetch:", url);
+            // Decompress using fflate
+            let decompressedData = fflate.gunzipSync(new Uint8Array(compressedData));
+            let svgContent = new TextDecoder().decode(decompressedData);
 
-            const response = await fetch(url);
-            const compressedData = await response.arrayBuffer();
-
-            console.log("Attempting to decompress...");
-            
-            import { inflate } from 'https://ordinals.com/content/fba6f95fb1152db43304a27dce8cb8c65509eba6ab0b6958cedeb33e5f443077i0';
-            const decompressedData = inflate(new Uint8Array(compressedData), { to: 'string' });
-
-            console.log("Decompressed SVG first 100 chars:", decompressedData.substring(0, 100));
-
-            const embedContainer = document.getElementById('svg-container');
-            embedContainer.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(decompressedData)}`;
+            // Insert SVG into the DOM (make sure SVG doesn't have embedded scripts for safety)
+            document.getElementById('scene').innerHTML = svgContent;
         }
 
-        const svgzUrl = 'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0';
-        displaySvgz(svgzUrl);
+        fetchAndDisplaySVGZ(); // Fetch, decompress and display SVGZ on page load
     </script>
-
 </body>
 </html>
