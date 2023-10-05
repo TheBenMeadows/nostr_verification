@@ -11,6 +11,11 @@
             
             const container = document.getElementById('svg-container');
             container.innerHTML = decompressedData;
+
+            // Get the inserted SVG and set its dimensions
+            const svgElement = container.querySelector('svg');
+            svgElement.setAttribute('width', '100%');
+            svgElement.setAttribute('height', '100%');
         }
 
         const svgzUrl = 'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0';
