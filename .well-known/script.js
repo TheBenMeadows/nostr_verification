@@ -11,7 +11,9 @@ async function displaySvgz(url) {
     // Wait for the script to load, then use pako
     script.onload = function () {
         // Retrieve the URL parameter from the script tag
-        const svgzUrl = script.getAttribute('data-svgz-url');
+        const scripts = document.getElementsByTagName('script');
+        const currentScript = scripts[scripts.length - 1];
+        const svgzUrl = currentScript.getAttribute('data-svgz-url');
         const decompressedData = pako.inflate(new Uint8Array(compressedData), { to: 'string' });
         const embedContainer = document.getElementById('svg-container');
         embedContainer.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(decompressedData)}`;
@@ -20,3 +22,4 @@ async function displaySvgz(url) {
 
 // Call the displaySvgz function with the specified URL
 displaySvgz();
+
