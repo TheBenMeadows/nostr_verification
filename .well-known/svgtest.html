@@ -21,7 +21,11 @@
             const compressedData = await response.arrayBuffer();
             const decompressedData = inflate(new Uint8Array(compressedData), {to: 'string'});
             const embedContainer = document.getElementById('svg-container');
-            embedContainer.srcdoc = decompressedData;
+
+            // Add the CSS to the SVG content
+            const styleContent = '<style>svg { width: 100%; height: 100%; }</style>';
+            const modifiedSVGContent = styleContent + decompressedData;
+            embedContainer.srcdoc = modifiedSVGContent;
         }
         const svgzUrl = 'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0';
         displaySvgz(svgzUrl);
