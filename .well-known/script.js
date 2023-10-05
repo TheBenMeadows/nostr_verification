@@ -4,12 +4,10 @@ async function displaySvgz(url) {
     const response = await fetch(url);
     const compressedData = await response.arrayBuffer();
     const decompressedData = inflate(new Uint8Array(compressedData), {to: 'string'});
-    const embedContainer = document.getElementById('svg-container');
-    embedContainer.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(decompressedData)}`;
+
+    // Instead of setting the src of the embed tag, we'll inject the SVG directly into the DOM
+    document.body.innerHTML = decompressedData;
 }
 
-window.addEventListener('svgz-url-set', () => {
-    const embedContainer = document.getElementById('svg-container');
-    const svgzUrl = embedContainer.getAttribute('data-svgz-url');
-    displaySvgz(svgzUrl);
-});
+const svgzUrl = 'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0';
+displaySvgz(svgzUrl);
