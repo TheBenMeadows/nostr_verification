@@ -15,7 +15,7 @@
     <script>
         async function fetchAndDisplaySVGZ() {
             // Fetch the SVGZ
-            let response = await fetch('https://raw.githubusercontent.com/TheBenMeadows/HostedFiles/master/Mask%20-%20Bulls%20Zip.svgz');
+            let response = await fetch('https://nostr.thebenmeadows.com/well-known/Mask%20-%20Bulls%20Zip.svgz');
             let compressedData = await response.arrayBuffer();
 
             // Decompress using fflate
