@@ -8,7 +8,7 @@ async function displaySvgz(url) {
     embedContainer.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(decompressedData)}`;
 }
 
-// Retrieve svgzUrl from the script tag's data-svgz-url attribute
-const currentScript = document.currentScript;
-const svgzUrl = currentScript.getAttribute('data-svgz-url');
+// Retrieve svgzUrl from the embed tag's data-svgz-url attribute
+const embedContainer = document.getElementById('svg-container');
+const svgzUrl = embedContainer.getAttribute('data-svgz-url');
 displaySvgz(svgzUrl);
