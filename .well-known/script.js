@@ -1,4 +1,4 @@
-import { inflate } from 'https://ordinals.com/content/fba6f95fb1152db43304a27dce8cb8c65509eba6ab0b6958cedeb33e5f443077i0';
+console.log("Traditional script is running.");
 
 async function displaySvgz(url) {
     console.log("Fetching SVGZ from:", url);
@@ -7,7 +7,7 @@ async function displaySvgz(url) {
     const compressedData = await response.arrayBuffer();
     
     console.log("Decompressing SVGZ...");
-    const decompressedData = inflate(new Uint8Array(compressedData), {to: 'string'});
+    const decompressedData = pako.inflate(new Uint8Array(compressedData), {to: 'string'});
     console.log("Decompressed SVG first 100 chars:", decompressedData.substring(0, 100));
     
     // Parse the SVG data and insert it directly into the body
