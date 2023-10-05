@@ -21,5 +21,5 @@ async function displaySvgz(url) {
     console.log("SVG should be displayed now.");
 }
 
-const svgzUrl = 'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0';
+const svgzUrl = 'https://raw.githubusercontent.com/TheBenMeadows/HostedFiles/master/Mask%20-%20Bulls%20Zip.svgz';
 displaySvgz(svgzUrl);
