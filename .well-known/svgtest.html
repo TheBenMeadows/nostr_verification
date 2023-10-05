@@ -1,8 +1,21 @@
 <html>
-<body style="margin:0px;">
-    <iframe id="svg-container" width="100%" height="100%" frameborder="0"></iframe>
+<head>
+    <style>
+        html, body, iframe {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="svg-container" frameborder="0"></iframe>
     <script type="module">
         import { inflate } from 'https://ordinals.com/content/fba6f95fb1152db43304a27dce8cb8c65509eba6ab0b6958cedeb33e5f443077i0';
+
         async function displaySvgz(url) {
             const response = await fetch(url);
             const compressedData = await response.arrayBuffer();
