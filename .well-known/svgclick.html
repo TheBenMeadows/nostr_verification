@@ -3,7 +3,16 @@
 <body style="margin:0px;">
   <div id="svg-container"></div>
   <script>
-    async function displaySvg(svgzUrl) {
+    // Define the paths for the SVGZ files
+    const svgzUrls = [
+      'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0',
+      'https://nostr.thebenmeadows.com/.well-known/bulls%20mask%20-%20glitch.svgz'
+    ];
+
+    let currentSvgIndex = 0;  // Initially, the first SVG is loaded
+
+    async function displaySvg() {
+      const svgzUrl = svgzUrls[currentSvgIndex];
       const response = await fetch(svgzUrl);
       const compressedData = await response.arrayBuffer();
 
@@ -19,14 +28,18 @@
       svgElement.setAttribute('width', '100%');
       svgElement.setAttribute('height', '100%');
 
-      // Attach event listener to the SVG to load the second SVGZ upon click
-      svgElement.addEventListener('click', () => {
-        displaySvg('https://nostr.thebenmeadows.com/.well-known/bulls%20mask%20-%20glitch.svgz');
-      });
+      // Attach event listener to the SVG to switch SVGZ upon click
+      svgElement.addEventListener('click', switchSvg);
     }
 
-    // Initial load of the first SVGZ
-    displaySvg('https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0');
+    function switchSvg() {
+      // Switch to the other SVGZ
+      currentSvgIndex = 1 - currentSvgIndex;
+      displaySvg();
+    }
+
+    // Initial load
+    displaySvg();
   </script>
 </body>
 
