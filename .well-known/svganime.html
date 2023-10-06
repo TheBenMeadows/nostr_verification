@@ -1,0 +1,54 @@
+<html>
+
+<body style="margin:0px;">
+  <div id="svg-container-1"></div>
+  <div id="svg-container-2" style="display: none;"></div> <!-- Initially hidden -->
+
+  <script>
+    async function loadSvg(svgzUrl, containerId) {
+      const response = await fetch(svgzUrl);
+      const compressedData = await response.arrayBuffer();
+
+      const module = await import('https://ordinals.com/content/fba6f95fb1152db43304a27dce8cb8c65509eba6ab0b6958cedeb33e5f443077i0');
+      const decompressedData = module.inflate(new Uint8Array(compressedData), {
+        to: 'string'
+      });
+
+      const container = document.getElementById(containerId);
+      container.innerHTML = decompressedData;
+
+      const svgElement = container.querySelector('svg');
+      svgElement.setAttribute('width', '100%');
+      svgElement.setAttribute('height', '100%');
+    }
+
+    function animateSvgSequence() {
+      const svg1 = document.getElementById('svg-container-1');
+      const svg2 = document.getElementById('svg-container-2');
+
+      // Show SVG 1 and hide SVG 2
+      svg1.style.display = 'block';
+      svg2.style.display = 'none';
+
+      setTimeout(() => {
+        // Hide SVG 1 and show SVG 2
+        svg1.style.display = 'none';
+        svg2.style.display = 'block';
+
+        setTimeout(() => {
+          animateSvgSequence(); // Loop the animation
+        }, 2000); // Show SVG 2 for 2 seconds
+      }, 2000); // Show SVG 1 for 2 seconds
+    }
+
+    async function init() {
+      await loadSvg('https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0', 'svg-container-1');
+      await loadSvg('https://nostr.thebenmeadows.com/.well-known/bulls%20mask%20-%20glitch.svgz', 'svg-container-2');
+      animateSvgSequence();
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
