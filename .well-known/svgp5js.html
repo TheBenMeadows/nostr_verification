@@ -2,35 +2,7 @@
 
 <body style="margin:0px;">
     <div id="svg-container"></div>
-
-    <script type="module">
-        import('https://ordinals.com/content/f815bd5c566c6e46de5cdb6ccb3a7043c63deeba61f4234baea84b602b0d4440i0').then(async (fflate) => {
-            window.p5LoadedPromise = new Promise(async (resolve, reject) => {
-                try {
-                    const res = await fetch('https://ordinals.com/content/255ce0c5a0d8aca39510da72e604ef8837519028827ba7b7f723b7489f3ec3a4i0');
-                    const base64Data = await res.text();
-                    const compressed = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-
-                    const inflated = fflate.gunzipSync(compressed);
-                    const p5 = new TextDecoder().decode(inflated);
-                    eval(p5);
-
-                    resolve();
-                } catch (err) {
-                    console.error(err);
-                    reject(err);
-                }
-            });
-
-            window.p5LoadedPromise.then(() => {
-                console.log('p5.js has been loaded');
-                // Once p5 is loaded, you can proceed with loading and manipulating the SVG
-                displaySvg();
-            }).catch((err) => {
-                console.error('Failed to load p5.js:', err);
-            });
-        });
-
+    <script>
         async function displaySvg() {
             const svgzUrl = 'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0';
             const response = await fetch(svgzUrl);
@@ -46,15 +18,26 @@
             svgElement.setAttribute('width', '100%');
             svgElement.setAttribute('height', '100%');
 
-            // Add event listener to change colors of the SVG using p5.js
-            svgElement.addEventListener('click', () => {
-                const paths = svgElement.querySelectorAll('path, circle, rect, polygon, polyline');  // All SVG shape elements
-                paths.forEach(path => {
-                    const randomColor = color(random(255), random(255), random(255));  // Random p5.js color
-                    path.setAttribute('fill', randomColor);
-                });
+            svgElement.addEventListener('click', changeSvgColors);
+        }
+
+        function changeSvgColors() {
+            const svgElement = document.querySelector('svg');
+            const elements = svgElement.querySelectorAll('path, circle, rect, polygon, polyline');
+            elements.forEach(el => {
+                el.setAttribute('fill', getRandomColor());
+                if(el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none') {
+                    el.setAttribute('stroke', getRandomColor());
+                }
             });
         }
+
+        function getRandomColor() {
+            const getRandomValue = () => Math.floor(Math.random() * 256);
+            return `rgb(${getRandomValue()}, ${getRandomValue()}, ${getRandomValue()})`;
+        }
+
+        displaySvg();
     </script>
 </body>
 
