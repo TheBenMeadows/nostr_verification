@@ -6,13 +6,15 @@
     // Define the paths for the SVGZ files
     const svgzUrls = [
       'https://ordinals.com/content/62a77ef2f8fa7caaa237c36cd7404d1a46918c074d79bb73228108d7e0968b11i0',
-      'https://nostr.thebenmeadows.com/.well-known/bulls%20mask%20-%20glitch.svgz'
+      'https://nostr.thebenmeadows.com/.well-known/ben%20mask.svgz', 
+      'https://nostr.thebenmeadows.com/.well-known/pink%20mask.svgz'  
     ];
 
     let currentSvgIndex = 0;  // Initially, the first SVG is loaded
+    let isHovered = false;
 
-    async function displaySvg() {
-      const svgzUrl = svgzUrls[currentSvgIndex];
+    async function displaySvg(index = currentSvgIndex) {
+      const svgzUrl = svgzUrls[index];
       const response = await fetch(svgzUrl);
       const compressedData = await response.arrayBuffer();
 
@@ -30,6 +32,21 @@
 
       // Attach event listener to the SVG to switch SVGZ upon click
       svgElement.addEventListener('click', switchSvg);
+
+      // Attach mouseover and mouseout event listeners to handle hover
+      svgElement.addEventListener('mouseover', () => {
+        if (!isHovered) {
+          isHovered = true;
+          displaySvg(2);  // Display the third SVGZ on hover
+        }
+      });
+
+      svgElement.addEventListener('mouseout', () => {
+        if (isHovered) {
+          isHovered = false;
+          displaySvg();  // Go back to the current SVGZ after hover ends
+        }
+      });
     }
 
     function switchSvg() {
@@ -43,4 +60,4 @@
   </script>
 </body>
 
-</html>
+</html>  
