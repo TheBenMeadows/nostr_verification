@@ -24,35 +24,16 @@
         function changeSvgColors() {
             const svgElement = document.querySelector('svg');
             const elements = svgElement.querySelectorAll('path, circle, rect, polygon, polyline');
-            
-            let originalColors = new Set();
-            elements.forEach(el => {
-                originalColors.add(el.getAttribute('fill'));
-                if(el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none') {
-                    originalColors.add(el.getAttribute('stroke'));
-                }
-            });
 
-            if(originalColors.size !== 2) {
-                console.warn("The SVG does not use exactly two distinct colors.");
-                return;
-            }
-
-            const [originalColor1, originalColor2] = [...originalColors];
-            const newColor1 = getRandomColor();
-            const newColor2 = getRandomColor();
+            const newColor = getRandomColor();
 
             elements.forEach(el => {
-                if (el.getAttribute('fill') === originalColor1) {
-                    el.setAttribute('fill', newColor1);
-                } else if (el.getAttribute('fill') === originalColor2) {
-                    el.setAttribute('fill', newColor2);
+                if (el.getAttribute('fill') === '#FBA5FE') {
+                    el.setAttribute('fill', newColor);
                 }
 
-                if (el.getAttribute('stroke') === originalColor1) {
-                    el.setAttribute('stroke', newColor1);
-                } else if (el.getAttribute('stroke') === originalColor2) {
-                    el.setAttribute('stroke', newColor2);
+                if (el.getAttribute('stroke') === '#FBA5FE') {
+                    el.setAttribute('stroke', newColor);
                 }
             });
         }
@@ -67,3 +48,4 @@
 </body>
 
 </html>
+
