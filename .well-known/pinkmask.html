@@ -1,11 +1,7 @@
 <html>
-
 <body style="margin:0px;">
     <div id="svg-container"></div>
     <script>
-        let isDefaultColors = true; // State to manage which color scheme is active
-        let singleClickTimeout; // Timeout reference for the single click
-
         async function displaySvg() {
             const svgzUrl = 'https://nostr.thebenmeadows.com/.well-known/pink%20mask.svgz';
             const response = await fetch(svgzUrl);
@@ -21,37 +17,36 @@
             svgElement.setAttribute('width', '100%');
             svgElement.setAttribute('height', '100%');
 
-            svgElement.addEventListener('click', handleSingleClick);
-            svgElement.addEventListener('dblclick', handleDoubleClick);
+            svgElement.addEventListener('click', changeSvgColors);
+            svgElement.addEventListener('dblclick', toggleSvgColors);
         }
 
-        function handleSingleClick() {
-            // Clear previous timeout if any
-            clearTimeout(singleClickTimeout);
+        let isDefaultColors = true;
+        let lastClickTime = 0;
 
-            // Set a delay for the single click action
-            singleClickTimeout = setTimeout(changeToRandomColor, 200);
-        }
+        function changeSvgColors() {
+            const currentTime = new Date().getTime();
+            if (currentTime - lastClickTime < 300) return;
 
-        function handleDoubleClick() {
-            clearTimeout(singleClickTimeout); // Clear the timeout for the single click
-            toggleSvgColors();
-        }
-
-        function changeToRandomColor() {
             const svgElement = document.querySelector('svg');
             const elements = svgElement.querySelectorAll('path, circle, rect, polygon, polyline');
 
-            const randomColor = getRandomColor();
+            const newColor = getRandomColor();
 
             elements.forEach(el => {
-                if (el.getAttribute('fill') && el.getAttribute('fill') !== 'none' && el.getAttribute('fill') !== '#000000' && el.getAttribute('fill') !== 'rgb(0,0,0)') {
-                    el.setAttribute('fill', randomColor);
+                const fill = el.getAttribute('fill');
+                const stroke = el.getAttribute('stroke');
+
+                if (fill && fill !== 'none' && fill !== '#000000' && fill !== 'rgb(0,0,0)') {
+                    el.setAttribute('fill', newColor);
                 }
-                if (el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none' && el.getAttribute('stroke') !== '#000000' && el.getAttribute('stroke') !== 'rgb(0,0,0)') {
-                    el.setAttribute('stroke', randomColor);
+
+                if (stroke && stroke !== 'none' && stroke !== '#000000' && stroke !== 'rgb(0,0,0)') {
+                    el.setAttribute('stroke', newColor);
                 }
             });
+
+            lastClickTime = currentTime;
         }
 
         function toggleSvgColors() {
@@ -95,5 +90,4 @@
         displaySvg();
     </script>
 </body>
-
 </html>
