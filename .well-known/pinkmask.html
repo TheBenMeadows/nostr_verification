@@ -1,0 +1,99 @@
+<html>
+
+<body style="margin:0px;">
+    <div id="svg-container"></div>
+    <script>
+        let isDefaultColors = true; // State to manage which color scheme is active
+        let singleClickTimeout; // Timeout reference for the single click
+
+        async function displaySvg() {
+            const svgzUrl = 'https://nostr.thebenmeadows.com/.well-known/pink%20mask.svgz';
+            const response = await fetch(svgzUrl);
+            const compressedData = await response.arrayBuffer();
+
+            const module = await import('https://ordinals.com/content/fba6f95fb1152db43304a27dce8cb8c65509eba6ab0b6958cedeb33e5f443077i0');
+            const decompressedData = module.inflate(new Uint8Array(compressedData), {to: 'string'});
+
+            const container = document.getElementById('svg-container');
+            container.innerHTML = decompressedData;
+
+            const svgElement = container.querySelector('svg');
+            svgElement.setAttribute('width', '100%');
+            svgElement.setAttribute('height', '100%');
+
+            svgElement.addEventListener('click', handleSingleClick);
+            svgElement.addEventListener('dblclick', handleDoubleClick);
+        }
+
+        function handleSingleClick() {
+            // Clear previous timeout if any
+            clearTimeout(singleClickTimeout);
+
+            // Set a delay for the single click action
+            singleClickTimeout = setTimeout(changeToRandomColor, 200);
+        }
+
+        function handleDoubleClick() {
+            clearTimeout(singleClickTimeout); // Clear the timeout for the single click
+            toggleSvgColors();
+        }
+
+        function changeToRandomColor() {
+            const svgElement = document.querySelector('svg');
+            const elements = svgElement.querySelectorAll('path, circle, rect, polygon, polyline');
+
+            const randomColor = getRandomColor();
+
+            elements.forEach(el => {
+                if (el.getAttribute('fill') && el.getAttribute('fill') !== 'none' && el.getAttribute('fill') !== '#000000' && el.getAttribute('fill') !== 'rgb(0,0,0)') {
+                    el.setAttribute('fill', randomColor);
+                }
+                if (el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none' && el.getAttribute('stroke') !== '#000000' && el.getAttribute('stroke') !== 'rgb(0,0,0)') {
+                    el.setAttribute('stroke', randomColor);
+                }
+            });
+        }
+
+        function toggleSvgColors() {
+            const svgElement = document.querySelector('svg');
+            const elements = svgElement.querySelectorAll('path, circle, rect, polygon, polyline');
+
+            if (isDefaultColors) {
+                // Switch to the new color scheme
+                elements.forEach(el => {
+                    if (el.getAttribute('fill') && el.getAttribute('fill') !== 'none') {
+                        el.getAttribute('fill') !== '#000000' && el.getAttribute('fill') !== 'rgb(0,0,0)'
+                            ? el.setAttribute('fill', '#F7931A')
+                            : el.setAttribute('fill', '#4D4D4D');
+                    }
+                    if (el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none') {
+                        el.getAttribute('stroke') !== '#000000' && el.getAttribute('stroke') !== 'rgb(0,0,0)'
+                            ? el.setAttribute('stroke', '#F7931A')
+                            : el.setAttribute('stroke', '#4D4D4D');
+                    }
+                });
+                isDefaultColors = false;
+            } else {
+                // Switch back to the original color scheme
+                elements.forEach(el => {
+                    if (el.getAttribute('fill') && el.getAttribute('fill') !== 'none') {
+                        el.setAttribute('fill', '#FBA5FE');
+                    }
+                    if (el.getAttribute('stroke') && el.getAttribute('stroke') !== 'none') {
+                        el.setAttribute('stroke', '#000000');
+                    }
+                });
+                isDefaultColors = true;
+            }
+        }
+
+        function getRandomColor() {
+            const getRandomValue = () => Math.floor(Math.random() * 256);
+            return `rgb(${getRandomValue()}, ${getRandomValue()}, ${getRandomValue()})`;
+        }
+
+        displaySvg();
+    </script>
+</body>
+
+</html>
