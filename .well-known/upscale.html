@@ -97,7 +97,7 @@
                 upscaleText.style.display = 'block';
 
                 // Defer the upscaling process to allow the browser to render the original image first
-                requestAnimationFrame(() => {
+                setTimeout(() => {
                     const offscreenCanvas = document.createElement('canvas');
                     offscreenCanvas.width = img.width;
                     offscreenCanvas.height = img.height;
@@ -115,15 +115,12 @@
 
                     // Hide the "Upscaling..." text
                     upscaleText.style.display = 'none';
-                });
+                }, 100); // A short delay to ensure the original image is rendered first
             };
             img.src = pngUrl;
         };
 
     </script>
 </body>
-
-</html>
-
 
 </html>
