@@ -21,7 +21,41 @@
         }
 
         function upscaleImage(ctx, img, scaleFactor) {
-            // ... [rest of the upscaleImage function as provided before]
+            const [width, height] = [img.width, img.height];
+            const upscaledData = ctx.createImageData(width * scaleFactor, height * scaleFactor);
+            const originalData = ctx.getImageData(0, 0, width, height).data;
+
+            for (let y = 0; y < height * scaleFactor; y++) {
+                for (let x = 0; x < width * scaleFactor; x++) {
+                    let r = 0, g = 0, b = 0, a = 0, lanczosSum = 0;
+                    const xSource = x / scaleFactor;
+                    const ySource = y / scaleFactor;
+
+                    for (let j = -3; j <= 3; j++) {
+                        for (let i = -3; i <= 3; i++) {
+                            const xSample = Math.floor(xSource + i);
+                            const ySample = Math.floor(ySource + j);
+                            if (xSample >= 0 && xSample < width && ySample >= 0 && ySample < height) {
+                                const pos = (ySample * width + xSample) * 4;
+                                const l = lanczos(i - (xSource - xSample), 3) * lanczos(j - (ySource - ySample), 3);
+                                lanczosSum += l;
+                                r += originalData[pos] * l;
+                                g += originalData[pos + 1] * l;
+                                b += originalData[pos + 2] * l;
+                                a += originalData[pos + 3] * l;
+                            }
+                        }
+                    }
+
+                    const pos = (y * width * scaleFactor + x) * 4;
+                    upscaledData.data[pos] = r / lanczosSum;
+                    upscaledData.data[pos + 1] = g / lanczosSum;
+                    upscaledData.data[pos + 2] = b / lanczosSum;
+                    upscaledData.data[pos + 3] = a / lanczosSum;
+                }
+            }
+
+            return upscaledData;
         }
 
         window.onload = function () {
