@@ -64,13 +64,12 @@
 
             const img = new Image();
             img.onload = function () {
-                const upscaledWidth = img.width * 2;
-                const upscaledHeight = img.height * 2;
-                upscaledCanvas.width = upscaledWidth;
-                upscaledCanvas.height = upscaledHeight;
+                // Initially set the canvas dimensions to the original image size
+                upscaledCanvas.width = img.width;
+                upscaledCanvas.height = img.height;
 
                 // Draw the original image first
-                ctxUpscaled.drawImage(img, 0, 0, img.width, img.height);
+                ctxUpscaled.drawImage(img, 0, 0);
 
                 const offscreenCanvas = document.createElement('canvas');
                 offscreenCanvas.width = img.width;
@@ -80,7 +79,11 @@
 
                 const upscaledData = upscaleImage(ctxOffscreen, img, 2);
 
-                // Replace the original image with the upscaled image
+                // Adjust the canvas dimensions to the upscaled size
+                upscaledCanvas.width = img.width * 2;
+                upscaledCanvas.height = img.height * 2;
+
+                // Draw the upscaled image
                 ctxUpscaled.putImageData(upscaledData, 0, 0);
             };
             img.src = pngUrl;
