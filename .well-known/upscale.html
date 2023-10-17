@@ -69,6 +69,9 @@
                 upscaledCanvas.width = upscaledWidth;
                 upscaledCanvas.height = upscaledHeight;
 
+                // Draw the original image first
+                ctxUpscaled.drawImage(img, 0, 0, img.width, img.height);
+
                 const offscreenCanvas = document.createElement('canvas');
                 offscreenCanvas.width = img.width;
                 offscreenCanvas.height = img.height;
@@ -76,6 +79,8 @@
                 ctxOffscreen.drawImage(img, 0, 0);
 
                 const upscaledData = upscaleImage(ctxOffscreen, img, 2);
+
+                // Replace the original image with the upscaled image
                 ctxUpscaled.putImageData(upscaledData, 0, 0);
             };
             img.src = pngUrl;
