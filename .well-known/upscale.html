@@ -12,6 +12,13 @@
     <canvas id="upscaledCanvas"></canvas>
 
     <script>
+        // Move the lanczos function to the top
+        function lanczos(t, a = 3) {
+            if (t === 0) return 1;
+            if (t > a || t < -a) return 0;
+            return (Math.sin(Math.PI * t) * Math.sin(Math.PI * t / a)) / (Math.PI * Math.PI * t * t);
+        }
+
         const pngUrl = 'https://nostr.thebenmeadows.com/.well-known/tbm.jpg';
 
         function upscaleImage(ctx, img, scaleFactor) {
@@ -86,5 +93,8 @@
 
     </script>
 </body>
+
+</html>
+
 
 </html>
