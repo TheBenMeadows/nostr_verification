@@ -14,7 +14,7 @@
     <script>
         const pngUrl = 'https://nostr.thebenmeadows.com/.well-known/tbm.jpg';
 
-         function upscaleImage(ctx, img, scaleFactor) {
+        function upscaleImage(ctx, img, scaleFactor) {
             const [width, height] = [img.width, img.height];
             const upscaledData = ctx.createImageData(width * scaleFactor, height * scaleFactor);
             const originalData = ctx.getImageData(0, 0, width, height).data;
@@ -65,23 +65,21 @@
                 // Draw the original image first
                 ctxUpscaled.drawImage(img, 0, 0);
 
-                // Begin the upscaling process in the background
-                setTimeout(() => {
-                    const offscreenCanvas = document.createElement('canvas');
-                    offscreenCanvas.width = img.width;
-                    offscreenCanvas.height = img.height;
-                    const ctxOffscreen = offscreenCanvas.getContext('2d');
-                    ctxOffscreen.drawImage(img, 0, 0);
+                // Begin the upscaling process
+                const offscreenCanvas = document.createElement('canvas');
+                offscreenCanvas.width = img.width;
+                offscreenCanvas.height = img.height;
+                const ctxOffscreen = offscreenCanvas.getContext('2d');
+                ctxOffscreen.drawImage(img, 0, 0);
 
-                    const upscaledData = upscaleImage(ctxOffscreen, img, 2);
+                const upscaledData = upscaleImage(ctxOffscreen, img, 2);
 
-                    // Adjust the canvas dimensions to the upscaled size
-                    upscaledCanvas.width = img.width * 2;
-                    upscaledCanvas.height = img.height * 2;
+                // Adjust the canvas dimensions to the upscaled size
+                upscaledCanvas.width = img.width * 2;
+                upscaledCanvas.height = img.height * 2;
 
-                    // Draw the upscaled image
-                    ctxUpscaled.putImageData(upscaledData, 0, 0);
-                }, 0);
+                // Draw the upscaled image
+                ctxUpscaled.putImageData(upscaledData, 0, 0);
             };
             img.src = pngUrl;
         };
