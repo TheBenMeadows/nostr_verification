@@ -23,6 +23,31 @@
             border-radius: 5px;
             display: none;
         }
+
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        #modalContent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        #modalContent button {
+            margin: 10px;
+        }
     </style>
 </head>
 
@@ -30,6 +55,14 @@
     <div id="canvasContainer">
         <canvas id="upscaledCanvas"></canvas>
         <div id="upscaleText"></div>
+    </div>
+
+    <div id="modal">
+        <div id="modalContent">
+            Upscale?
+            <button id="btn2x">2X</button>
+            <button id="btn4x">4X</button>
+        </div>
     </div>
 
     <script>
@@ -83,60 +116,51 @@
             const upscaledCanvas = document.getElementById('upscaledCanvas');
             const ctxUpscaled = upscaledCanvas.getContext('2d');
             const upscaleText = document.getElementById('upscaleText');
+            const modal = document.getElementById('modal');
+            const btn2x = document.getElementById('btn2x');
+            const btn4x = document.getElementById('btn4x');
             let upscaled = false;
 
             const img = new Image();
             img.onload = function () {
-                // Set the canvas dimensions to the original image size
                 upscaledCanvas.width = img.width;
                 upscaledCanvas.height = img.height;
-
-                // Draw the original image first
                 ctxUpscaled.drawImage(img, 0, 0);
             };
             img.src = pngUrl;
 
-            let clickTimer = null;
-
             upscaledCanvas.addEventListener('click', function() {
-                if (upscaled) return; // Do nothing if already upscaled
-
-                if (clickTimer === null) {
-                    clickTimer = setTimeout(function() {
-                        upscaleText.innerText = "Upscaling 2X...";
-                        upscaleText.style.display = 'block';
-
-                        setTimeout(() => {
-                            const upscaledData = upscaleImage(ctxUpscaled, img, 2);
-                            upscaledCanvas.width = img.width * 2;
-                            upscaledCanvas.height = img.height * 2;
-                            ctxUpscaled.putImageData(upscaledData, 0, 0);
-                            upscaleText.style.display = 'none';
-                            upscaled = true;
-                        }, 100);
-
-                        clickTimer = null;
-                    }, 300);
-                } else {
-                    clearTimeout(clickTimer);
-                    clickTimer = null;
-
-                    upscaleText.innerText = "Upscaling 4X...";
-                    upscaleText.style.display = 'block';
-
-                    setTimeout(() => {
-                        const upscaledData = upscaleImage(ctxUpscaled, img, 4);
-                        upscaledCanvas.width = img.width * 4;
-                        upscaledCanvas.height = img.height * 4;
-                        ctxUpscaled.putImageData(upscaledData, 0, 0);
-                        upscaleText.style.display = 'none';
-                        upscaled = true;
-                    }, 100);
+                if (!upscaled) {
+                    modal.style.display = 'block';
                 }
             });
+
+            btn2x.addEventListener('click', function() {
+                upscale(2);
+            });
+
+            btn4x.addEventListener('click', function() {
+                upscale(4);
+            });
+
+            function upscale(scaleFactor) {
+                modal.style.display = 'none';
+                upscaleText.innerText = `Upscaling ${scaleFactor}X...`;
+                upscaleText.style.display = 'block';
+
+                setTimeout(() => {
+                    const upscaledData = upscaleImage(ctxUpscaled, img, scaleFactor);
+                    upscaledCanvas.width = img.width * scaleFactor;
+                    upscaledCanvas.height = img.height * scaleFactor;
+                    ctxUpscaled.putImageData(upscaledData, 0, 0);
+                    upscaleText.style.display = 'none';
+                    upscaled = true;
+                }, 100);
+            }
         };
 
     </script>
 </body>
 
 </html>
+
