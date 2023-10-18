@@ -29,7 +29,7 @@
 <body style="margin:0px;">
     <div id="canvasContainer">
         <canvas id="upscaledCanvas"></canvas>
-        <div id="upscaleText">Upscaling...</div>
+        <div id="upscaleText"></div>
     </div>
 
     <script>
@@ -39,7 +39,7 @@
             return (Math.sin(Math.PI * t) * Math.sin(Math.PI * t / a)) / (Math.PI * Math.PI * t * t);
         }
 
-        const pngUrl = 'https://nostr.thebenmeadows.com/.well-known/madison.png';
+        const pngUrl = 'https://nostr.thebenmeadows.com/.well-known/tbm.jpg';
 
         function upscaleImage(ctx, img, scaleFactor) {
             const [width, height] = [img.width, img.height];
@@ -83,6 +83,7 @@
             const upscaledCanvas = document.getElementById('upscaledCanvas');
             const ctxUpscaled = upscaledCanvas.getContext('2d');
             const upscaleText = document.getElementById('upscaleText');
+            let upscaled = false;
 
             const img = new Image();
             img.onload = function () {
@@ -92,32 +93,47 @@
 
                 // Draw the original image first
                 ctxUpscaled.drawImage(img, 0, 0);
-
-                // Show the "Upscaling..." text
-                upscaleText.style.display = 'block';
-
-                // Defer the upscaling process to allow the browser to render the original image first
-                setTimeout(() => {
-                    const offscreenCanvas = document.createElement('canvas');
-                    offscreenCanvas.width = img.width;
-                    offscreenCanvas.height = img.height;
-                    const ctxOffscreen = offscreenCanvas.getContext('2d');
-                    ctxOffscreen.drawImage(img, 0, 0);
-
-                    const upscaledData = upscaleImage(ctxOffscreen, img, 2);
-
-                    // Adjust the canvas dimensions to the upscaled size
-                    upscaledCanvas.width = img.width * 2;
-                    upscaledCanvas.height = img.height * 2;
-
-                    // Draw the upscaled image
-                    ctxUpscaled.putImageData(upscaledData, 0, 0);
-
-                    // Hide the "Upscaling..." text
-                    upscaleText.style.display = 'none';
-                }, 100); // A short delay to ensure the original image is rendered first
             };
             img.src = pngUrl;
+
+            let clickTimer = null;
+
+            upscaledCanvas.addEventListener('click', function() {
+                if (upscaled) return; // Do nothing if already upscaled
+
+                if (clickTimer === null) {
+                    clickTimer = setTimeout(function() {
+                        upscaleText.innerText = "Upscaling 2X...";
+                        upscaleText.style.display = 'block';
+
+                        setTimeout(() => {
+                            const upscaledData = upscaleImage(ctxUpscaled, img, 2);
+                            upscaledCanvas.width = img.width * 2;
+                            upscaledCanvas.height = img.height * 2;
+                            ctxUpscaled.putImageData(upscaledData, 0, 0);
+                            upscaleText.style.display = 'none';
+                            upscaled = true;
+                        }, 100);
+
+                        clickTimer = null;
+                    }, 300);
+                } else {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+
+                    upscaleText.innerText = "Upscaling 4X...";
+                    upscaleText.style.display = 'block';
+
+                    setTimeout(() => {
+                        const upscaledData = upscaleImage(ctxUpscaled, img, 4);
+                        upscaledCanvas.width = img.width * 4;
+                        upscaledCanvas.height = img.height * 4;
+                        ctxUpscaled.putImageData(upscaledData, 0, 0);
+                        upscaleText.style.display = 'none';
+                        upscaled = true;
+                    }, 100);
+                }
+            });
         };
 
     </script>
