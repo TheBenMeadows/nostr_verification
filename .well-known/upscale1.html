@@ -140,7 +140,6 @@
         window.onload = function () {
             const upscaledCanvas = document.getElementById('upscaledCanvas');
             const ctxUpscaled = upscaledCanvas.getContext('2d');
-            const modal = document.getElementById('modal');
             const btn2x = document.getElementById('btn2x');
             const btnInvert = document.getElementById('btnInvert');
             const btnBW = document.getElementById('btnBW');
@@ -155,7 +154,7 @@
             img.src = pngUrl;
 
             upscaledCanvas.addEventListener('dblclick', function() {
-                modal.style.display = 'block';
+                document.getElementById('modal').style.display = 'block';
             });
 
             btn2x.addEventListener('click', function() {
@@ -178,12 +177,19 @@
                 upscaledCanvas.height = img.height;
                 closeModal();
             });
+
+            function upscale(scaleFactor) {
+                const upscaledData = upscaleImage(ctxUpscaled, img, scaleFactor);
+                upscaledCanvas.width = img.width * scaleFactor;
+                upscaledCanvas.height = img.height * scaleFactor;
+                ctxUpscaled.putImageData(upscaledData, 0, 0);
+                closeModal();
+            }
+
+            function closeModal() {
+                document.getElementById('modal').style.display = 'none';
+            }
         };
-
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
     </script>
 </body>
 
