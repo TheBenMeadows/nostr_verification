@@ -137,10 +137,15 @@
             ctx.putImageData(imageData, 0, 0);
         }
 
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
         window.onload = function () {
             const upscaledCanvas = document.getElementById('upscaledCanvas');
             const ctxUpscaled = upscaledCanvas.getContext('2d');
             const upscaleText = document.getElementById('upscaleText');
+            const modal = document.getElementById('modal');
             const btn2x = document.getElementById('btn2x');
             const btnInvert = document.getElementById('btnInvert');
             const btnBW = document.getElementById('btnBW');
@@ -161,6 +166,7 @@
             btn2x.addEventListener('click', function() {
                 upscaleText.innerText = "Upscaling...";
                 upscaleText.style.display = 'block';
+                closeModal();
                 setTimeout(() => {
                     upscale(2);
                     upscaleText.style.display = 'none';
@@ -190,11 +196,6 @@
                 upscaledCanvas.width = img.width * scaleFactor;
                 upscaledCanvas.height = img.height * scaleFactor;
                 ctxUpscaled.putImageData(upscaledData, 0, 0);
-                closeModal();
-            }
-
-            function closeModal() {
-                document.getElementById('modal').style.display = 'none';
             }
         };
     </script>
