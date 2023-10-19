@@ -1,0 +1,210 @@
+<html>
+
+<head>
+    <style>
+        #canvasContainer {
+            position: relative;
+            display: inline-block;
+        }
+
+        #upscaledCanvas {
+            display: block;
+        }
+
+        #upscaleText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        #modalContent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        #modalContent button {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body style="margin:0px;">
+    <div id="canvasContainer">
+        <canvas id="upscaledCanvas"></canvas>
+        <div id="upscaleText"></div>
+    </div>
+
+    <div id="modal" onclick="closeModal()">
+        <div id="modalContent" onclick="event.stopPropagation()">
+            Choose an action:
+            <button id="btn2x">2X</button>
+            <button id="btn4x">4X</button>
+            <button id="btnInvert">Invert</button>
+            <button id="btnBW">B&W</button>
+        </div>
+    </div>
+
+    <script>
+        function lanczos(t, a = 3) {
+            if (t === 0) return 1;
+            if (t > a || t < -a) return 0;
+            return (Math.sin(Math.PI * t) * Math.sin(Math.PI * t / a)) / (Math.PI * Math.PI * t * t);
+        }
+
+        const pngUrl = 'https://nostr.thebenmeadows.com/.well-known/rsco.webp';
+
+        function upscaleImage(ctx, img, scaleFactor) {
+            const [width, height] = [img.width, img.height];
+            const upscaledData = ctx.createImageData(width * scaleFactor, height * scaleFactor);
+            const originalData = ctx.getImageData(0, 0, width, height).data;
+
+            for (let y = 0; y < height * scaleFactor; y++) {
+                for (let x = 0; x < width * scaleFactor; x++) {
+                    let r = 0, g = 0, b = 0, a = 0, lanczosSum = 0;
+                    const xSource = x / scaleFactor;
+                    const ySource = y / scaleFactor;
+
+                    for (let j = -3; j <= 3; j++) {
+                        for (let i = -3; i <= 3; i++) {
+                            const xSample = Math.floor(xSource + i);
+                            const ySample = Math.floor(ySource + j);
+                            if (xSample >= 0 && xSample < width && ySample >= 0 && ySample < height) {
+                                const pos = (ySample * width + xSample) * 4;
+                                const l = lanczos(i - (xSource - xSample), 3) * lanczos(j - (ySource - ySample), 3);
+                                lanczosSum += l;
+                                r += originalData[pos] * l;
+                                g += originalData[pos + 1] * l;
+                                b += originalData[pos + 2] * l;
+                                a += originalData[pos + 3] * l;
+                            }
+                        }
+                    }
+
+                    const pos = (y * width * scaleFactor + x) * 4;
+                    upscaledData.data[pos] = r / lanczosSum;
+                    upscaledData.data[pos + 1] = g / lanczosSum;
+                    upscaledData.data[pos + 2] = b / lanczosSum;
+                    upscaledData.data[pos + 3] = a / lanczosSum;
+                }
+            }
+
+            return upscaledData;
+        }
+
+        function invertColors(ctx, width, height) {
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255 - data[i];     // Invert red
+                data[i + 1] = 255 - data[i + 1]; // Invert green
+                data[i + 2] = 255 - data[i + 2]; // Invert blue
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function convertToGrayscale(ctx, width, height) {
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = avg;     // Set red to average
+                data[i + 1] = avg; // Set green to average
+                data[i + 2] = avg; // Set blue to average
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        window.onload = function () {
+            const upscaledCanvas = document.getElementById('upscaledCanvas');
+            const ctxUpscaled = upscaledCanvas.getContext('2d');
+            const upscaleText = document.getElementById('upscaleText');
+            const modal = document.getElementById('modal');
+            const btn2x = document.getElementById('btn2x');
+            const btn4x = document.getElementById('btn4x');
+            const btnInvert = document.getElementById('btnInvert');
+            const btnBW = document.getElementById('btnBW');
+            let upscaled = false;
+
+            const img = new Image();
+            img.onload = function () {
+                upscaledCanvas.width = img.width;
+                upscaledCanvas.height = img.height;
+                ctxUpscaled.drawImage(img, 0, 0);
+            };
+            img.src = pngUrl;
+
+            upscaledCanvas.addEventListener('dblclick', function () {
+                if (!upscaled) {
+                    modal.style.display = 'block';
+                }
+            });
+
+            btn2x.addEventListener('click', function () {
+                upscale(2);
+            });
+
+            btn4x.addEventListener('click', function () {
+                upscale(4);
+            });
+
+            btnInvert.addEventListener('click', function () {
+                invertColors(ctxUpscaled, upscaledCanvas.width, upscaledCanvas.height);
+                modal.style.display = 'none';
+            });
+
+            btnBW.addEventListener('click', function () {
+                convertToGrayscale(ctxUpscaled, upscaledCanvas.width, upscaledCanvas.height);
+                modal.style.display = 'none';
+            });
+
+            function upscale(scaleFactor) {
+                modal.style.display = 'none';
+                upscaleText.innerText = `Upscaling ${scaleFactor}X...`;
+                upscaleText.style.display = 'block';
+
+                setTimeout(() => {
+                    const upscaledData = upscaleImage(ctxUpscaled, img, scaleFactor);
+                    upscaledCanvas.width = img.width * scaleFactor;
+                    upscaledCanvas.height = img.height * scaleFactor;
+                    ctxUpscaled.putImageData(upscaledData, 0, 0);
+                    upscaleText.style.display = 'none';
+                    upscaled = true;
+                }, 100);
+            }
+        };
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+    </script>
+</body>
+
+</html>
