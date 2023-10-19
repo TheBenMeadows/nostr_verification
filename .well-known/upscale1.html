@@ -53,7 +53,7 @@
 
 <body style="margin:0px;">
     <div id="canvasContainer">
-        <canvas id="upscaledCanvas"></canvas>
+        <canvas id="upscaledCanvas" willReadFrequently="true"></canvas>
         <div id="upscaleText"></div>
     </div>
 
@@ -131,8 +131,8 @@
             for (let i = 0; i < data.length; i += 4) {
                 const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                 data[i] = avg;       // red
-                data[i + 1] = avg; // green
-                data[i + 2] = avg; // blue
+                data[i + 1] = avg;   // green
+                data[i + 2] = avg;   // blue
             }
             ctx.putImageData(imageData, 0, 0);
         }
@@ -140,6 +140,7 @@
         window.onload = function () {
             const upscaledCanvas = document.getElementById('upscaledCanvas');
             const ctxUpscaled = upscaledCanvas.getContext('2d');
+            const upscaleText = document.getElementById('upscaleText');
             const btn2x = document.getElementById('btn2x');
             const btnInvert = document.getElementById('btnInvert');
             const btnBW = document.getElementById('btnBW');
@@ -158,7 +159,12 @@
             });
 
             btn2x.addEventListener('click', function() {
-                upscale(2);
+                upscaleText.innerText = "Upscaling...";
+                upscaleText.style.display = 'block';
+                setTimeout(() => {
+                    upscale(2);
+                    upscaleText.style.display = 'none';
+                }, 100);
             });
 
             btnInvert.addEventListener('click', function() {
@@ -172,9 +178,10 @@
             });
 
             btnRevert.addEventListener('click', function() {
-                ctxUpscaled.drawImage(img, 0, 0);
+                ctxUpscaled.clearRect(0, 0, upscaledCanvas.width, upscaledCanvas.height);
                 upscaledCanvas.width = img.width;
                 upscaledCanvas.height = img.height;
+                ctxUpscaled.drawImage(img, 0, 0);
                 closeModal();
             });
 
