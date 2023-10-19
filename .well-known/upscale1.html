@@ -174,16 +174,10 @@
 
             btnRevert.addEventListener('click', function() {
                 ctxUpscaled.drawImage(img, 0, 0);
+                upscaledCanvas.width = img.width;
+                upscaledCanvas.height = img.height;
                 closeModal();
             });
-
-            function upscale(scaleFactor) {
-                modal.style.display = 'none';
-                const upscaledData = upscaleImage(ctxUpscaled, img, scaleFactor);
-                upscaledCanvas.width = img.width * scaleFactor;
-                upscaledCanvas.height = img.height * scaleFactor;
-                ctxUpscaled.putImageData(upscaledData, 0, 0);
-            }
         };
 
         function closeModal() {
