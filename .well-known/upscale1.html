@@ -24,7 +24,7 @@
             display: none;
         }
 
-        #modal, #revertModal {
+        #modal {
             display: none;
             position: fixed;
             top: 0;
@@ -35,7 +35,7 @@
             z-index: 1000;
         }
 
-        #modalContent, #revertModalContent {
+        #modalContent {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -45,7 +45,7 @@
             border-radius: 5px;
         }
 
-        #modalContent button, #revertModalContent button {
+        #modalContent button {
             margin: 10px;
         }
     </style>
@@ -59,18 +59,11 @@
 
     <div id="modal" onclick="closeModal()">
         <div id="modalContent" onclick="event.stopPropagation()">
-            Choose an action:
+            Options:
             <button id="btn2x">2X</button>
-            <button id="btn4x">4X</button>
-            <button id="btnInvert">Invert</button>
+            <button id="btnInvert">Invert Colors</button>
             <button id="btnBW">B&W</button>
-        </div>
-    </div>
-
-    <div id="revertModal" onclick="closeRevertModal()">
-        <div id="revertModalContent" onclick="event.stopPropagation()">
-            Revert to original?
-            <button id="btnYes">YES</button>
+            <button id="btnRevert">Revert</button>
         </div>
     </div>
 
@@ -125,9 +118,9 @@
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
             for (let i = 0; i < data.length; i += 4) {
-                data[i] = 255 - data[i];     // Red channel
-                data[i + 1] = 255 - data[i + 1]; // Green channel
-                data[i + 2] = 255 - data[i + 2]; // Blue channel
+                data[i] = 255 - data[i];       // red
+                data[i + 1] = 255 - data[i + 1]; // green
+                data[i + 2] = 255 - data[i + 2]; // blue
             }
             ctx.putImageData(imageData, 0, 0);
         }
@@ -137,9 +130,9 @@
             const data = imageData.data;
             for (let i = 0; i < data.length; i += 4) {
                 const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                data[i] = avg;     // Red channel
-                data[i + 1] = avg; // Green channel
-                data[i + 2] = avg; // Blue channel
+                data[i] = avg;       // red
+                data[i + 1] = avg; // green
+                data[i + 2] = avg; // blue
             }
             ctx.putImageData(imageData, 0, 0);
         }
@@ -147,16 +140,11 @@
         window.onload = function () {
             const upscaledCanvas = document.getElementById('upscaledCanvas');
             const ctxUpscaled = upscaledCanvas.getContext('2d');
-            const upscaleText = document.getElementById('upscaleText');
             const modal = document.getElementById('modal');
-            const revertModal = document.getElementById('revertModal');
             const btn2x = document.getElementById('btn2x');
-            const btn4x = document.getElementById('btn4x');
             const btnInvert = document.getElementById('btnInvert');
             const btnBW = document.getElementById('btnBW');
-            const btnYes = document.getElementById('btnYes');
-            let upscaled = false;
-            let modified = false;
+            const btnRevert = document.getElementById('btnRevert');
 
             const img = new Image();
             img.onload = function () {
@@ -167,70 +155,41 @@
             img.src = pngUrl;
 
             upscaledCanvas.addEventListener('dblclick', function() {
-                ctxUpscaled.drawImage(img, 0, 0); // Remove any applied effects
-                if (modified) {
-                    revertModal.style.display = 'block';
-                } else if (!upscaled) {
-                    modal.style.display = 'block';
-                }
+                modal.style.display = 'block';
             });
 
             btn2x.addEventListener('click', function() {
                 upscale(2);
             });
 
-            btn4x.addEventListener('click', function() {
-                upscale(4);
-            });
-
             btnInvert.addEventListener('click', function() {
                 invertColors(ctxUpscaled, upscaledCanvas.width, upscaledCanvas.height);
-                modified = true;
-                modal.style.display = 'none';
+                closeModal();
             });
 
             btnBW.addEventListener('click', function() {
                 convertToGrayscale(ctxUpscaled, upscaledCanvas.width, upscaledCanvas.height);
-                modified = true;
-                modal.style.display = 'none';
+                closeModal();
             });
 
-            btnYes.addEventListener('click', function() {
+            btnRevert.addEventListener('click', function() {
                 ctxUpscaled.drawImage(img, 0, 0);
-                modified = false;
-                revertModal.style.display = 'none';
+                closeModal();
             });
 
-            function upscale(factor) {
-                upscaleText.style.display = 'block';
-                upscaleText.innerText = `Upscaling ${factor}X...`;
-                setTimeout(function() {
-                    const upscaledData = upscaleImage(ctxUpscaled, img, factor);
-                    ctxUpscaled.putImageData(upscaledData, 0, 0);
-                    modal.style.display = 'none';
-                    upscaleText.style.display = 'none';
-                    upscaled = true;
-                    modified = true;
-                }, 100);
-            }
-
-            function closeModal() {
+            function upscale(scaleFactor) {
                 modal.style.display = 'none';
+                const upscaledData = upscaleImage(ctxUpscaled, img, scaleFactor);
+                upscaledCanvas.width = img.width * scaleFactor;
+                upscaledCanvas.height = img.height * scaleFactor;
+                ctxUpscaled.putImageData(upscaledData, 0, 0);
             }
-
-            function closeRevertModal() {
-                revertModal.style.display = 'none';
-            }
-
-            document.addEventListener('click', function(event) {
-                if (!modal.contains(event.target) && !upscaledCanvas.contains(event.target)) {
-                    closeModal();
-                }
-                if (!revertModal.contains(event.target) && !upscaledCanvas.contains(event.target)) {
-                    closeRevertModal();
-                }
-            });
         };
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
     </script>
 </body>
 
