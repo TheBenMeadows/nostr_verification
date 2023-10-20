@@ -4,6 +4,7 @@
     <![CDATA[
       var singleClickTimeout;
       var isGray = false;
+      var lastColorSet;
 
       // Predefined color sets with enough contrast
       var predefinedColorSets = [
@@ -15,13 +16,18 @@
         ['#76C066', '#AD2BBB']
       ];
 
-      function getRandomItem(array) {
-        return array[Math.floor(Math.random() * array.length)];
+      function getRandomItem(array, exclude) {
+        var item;
+        do {
+          item = array[Math.floor(Math.random() * array.length)];
+        } while (item === exclude);
+        return item;
       }
 
       function changeToRandomColor() {
         var imageElement = document.getElementById("imageElement");
-        var colorSet = getRandomItem(predefinedColorSets);
+        var colorSet = getRandomItem(predefinedColorSets, lastColorSet);
+        lastColorSet = colorSet; // Store the last applied color set
         var color1 = colorSet[0];
         var color2 = colorSet[1];
 
@@ -35,7 +41,6 @@
           </feComponentTransfer>
         `;
         imageElement.setAttribute("filter", "url(#duotone)");
-        isGray = false; // Reset grayscale flag
       }
 
       function toggleGrayScale() {
