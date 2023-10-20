@@ -54,8 +54,8 @@
 
 <body style="margin:0px;">
     <div id="canvasContainer">
-        <svg id="upscaledSvg" viewBox="0 0 100 100">
-            <image id="upscaledImage" height="100%" width="100%" href="" />
+        <svg id="upscaledSvg" viewBox="0 0 100 100" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <image id="upscaledImage" height="100%" width="100%" href="" xlink:href="" />
         </svg>
         <div id="upscaleText"></div>
     </div>
@@ -130,8 +130,13 @@
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = function () {
+                console.log("Image loaded");  // Debug log
                 upscaledSvg.setAttribute("viewBox", `0 0 ${img.width} ${img.height}`);
                 upscaledImage.setAttribute("href", img.src);
+                upscaledImage.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", img.src);
+            };
+            img.onerror = function () {
+                console.log("Image failed to load");  // Debug log
             };
             img.src = pngUrl;
 
