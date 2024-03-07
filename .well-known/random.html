@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random Image Display</title>
+</head>
+<body>
+
+<img id="randomImage" src="" alt="Random Image">
+
+<script>
+    // Array of image URLs
+    var images = [
+        'https://nostr.thebenmeadows.com/.well-known/gtest1.jpg',
+        'https://nostr.thebenmeadows.com/.well-known/gtest2.jpg',
+        'https://nostr.thebenmeadows.com/.well-known/gtest3.jpg',
+        'https://nostr.thebenmeadows.com/.well-known/gtest4.jpg',
+        'https://nostr.thebenmeadows.com/.well-known/gtest5.jpg'
+    ];
+
+    // Function to select a random image from the array
+    function displayRandomImage() {
+        var randomIndex = Math.floor(Math.random() * images.length);
+        var selectedImageUrl = images[randomIndex];
+        document.getElementById('randomImage').src = selectedImageUrl;
+    }
+
+    // Call the function as soon as the page loads
+    window.onload = displayRandomImage;
+</script>
+
+</body>
+</html>
